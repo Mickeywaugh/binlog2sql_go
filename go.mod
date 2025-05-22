@@ -5,7 +5,6 @@ go 1.24.3
 require (
 	github.com/go-mysql-org/go-mysql v1.12.0
 	github.com/go-sql-driver/mysql v1.9.2
-	github.com/siddontang/go-log v0.0.0-20190221022429-1e957dd83bed
 )
 
 require (

@@ -18,7 +18,6 @@ import (
 
 	"github.com/go-mysql-org/go-mysql/mysql"
 	"github.com/go-mysql-org/go-mysql/replication"
-	"github.com/siddontang/go-log/log"
 )
 
 var cfg *conf.Config
@@ -58,8 +57,8 @@ func main() {
 	if cfg.Local {
 		BinlogLocalReader(cfg.LocalFile)
 	} else {
-		var _fileSize string
-		var _encrypted bool
+		var _fileSize uint64
+		var _encrypted string
 		rows, err := db.Conn.Query("show binary logs;") // 获取所有日志文件列表，返回数据结构Log_name,File_size,Encrypted
 		if err != nil {
 			fmt.Println(err)
@@ -208,14 +207,15 @@ func BinlogLocalReader(file string) {
 }
 
 func BinlogStreamReader(conf *conf.Config) (*replication.BinlogStreamer, error) {
-	rand.Seed(time.Now().UnixNano())
-	handler, err := log.NewFileHandler("binlog2sql_go.log", os.O_CREATE|os.O_WRONLY)
-	if err != nil {
-		return nil, err
-	}
 
-	// 创建 slog.Logger 实例
-	logger := slog.New(slog.NewTextHandler(handler, &slog.HandlerOptions{Level: slog.LevelDebug}))
+	logFile, err := os.OpenFile("binlog2sql_go.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	if err != nil {
+		fmt.Println("打开日志文件失败: " + err.Error())
+	}
+	defer logFile.Close()
+
+	// 创建 slog.Logger 实例，将日志输出到指定的文件中
+	logger := slog.New(slog.NewTextHandler(logFile, &slog.HandlerOptions{Level: slog.LevelDebug}))
 
 	// 创建 BinlogSyncerConfig 实例
 	syncConf := replication.BinlogSyncerConfig{

@@ -3,10 +3,12 @@ package core
 import (
 	"bytes"
 	"fmt"
-	"github.com/go-mysql-org/go-mysql/replication"
+	"io"
 	"log"
 	"os"
 	"testing"
+
+	"github.com/go-mysql-org/go-mysql/replication"
 )
 
 func Test_generateDeleteSql(t *testing.T) {
@@ -82,7 +84,7 @@ func Test_concatSqlFromBinlogEvent(t *testing.T) {
 		t.Log(fmt.Errorf("core header is not match,file may be damaged "))
 		return
 	}
-	if _, err := f.Seek(binlogHeader, os.SEEK_SET); err != nil {
+	if _, err := f.Seek(binlogHeader, io.SeekStart); err != nil {
 		t.Log(err)
 		return
 	}
@@ -97,7 +99,7 @@ func Test_concatSqlFromBinlogEvent(t *testing.T) {
 
 func Test_genNoPkInsertSql(t *testing.T) {
 	//old_value := []interface{}{1, "world", "", "NULL", 22.35, true, nil}
-	val := []interface{}{1, "hello", "", "NULL", 22.35, true, nil}
+	val := []any{1, "hello", "", "NULL", 22.35, true, nil}
 	tab := &Table{
 		Schema:  "test",
 		Table:   "t",

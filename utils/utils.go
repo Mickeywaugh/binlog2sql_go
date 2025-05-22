@@ -1,10 +1,7 @@
 package utils
 
+import "slices"
+
 func Contains(list []string, key string) bool {
-	for _, l := range list {
-		if l == key {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(list, key)
 }

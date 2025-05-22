@@ -14,6 +14,8 @@ import (
 	"strings"
 	"time"
 
+	"log/slog"
+
 	"github.com/go-mysql-org/go-mysql/mysql"
 	"github.com/go-mysql-org/go-mysql/replication"
 	"github.com/siddontang/go-log/log"
@@ -209,7 +211,11 @@ func BinlogStreamReader(conf *conf.Config) (*replication.BinlogStreamer, error) 
 	if err != nil {
 		return nil, err
 	}
-	logger := log.NewDefault(handler)
+
+	// 创建 slog.Logger 实例
+	logger := slog.New(slog.NewTextHandler(handler, &slog.HandlerOptions{Level: slog.LevelDebug}))
+
+	// 创建 BinlogSyncerConfig 实例
 	syncConf := replication.BinlogSyncerConfig{
 		ServerID:        uint32(rand.Intn(2<<31) - 1),
 		Host:            conf.Host,

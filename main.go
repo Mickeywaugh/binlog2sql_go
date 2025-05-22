@@ -58,9 +58,9 @@ func main() {
 	if cfg.Local {
 		BinlogLocalReader(cfg.LocalFile)
 	} else {
-		var _ignore1 string
-		var _ignore2 string
-		rows, err := db.Conn.Query("show binary logs;")
+		var _fileSize string
+		var _encrypted bool
+		rows, err := db.Conn.Query("show binary logs;") // 获取所有日志文件列表，返回数据结构Log_name,File_size,Encrypted
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -70,7 +70,7 @@ func main() {
 		stopId, _ := strconv.Atoi(strings.Split(cfg.StopFile, ".")[1])
 		for rows.Next() {
 			var logName string
-			err := rows.Scan(&logName, &_ignore1, &_ignore2)
+			err := rows.Scan(&logName, &_fileSize, &_encrypted)
 			if err != nil {
 				fmt.Println(err)
 				return

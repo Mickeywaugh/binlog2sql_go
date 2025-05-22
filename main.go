@@ -58,7 +58,8 @@ func main() {
 	if cfg.Local {
 		BinlogLocalReader(cfg.LocalFile)
 	} else {
-		var _ignore string
+		var _ignore1 string
+		var _ignore2 string
 		rows, err := db.Conn.Query("show binary logs;")
 		if err != nil {
 			fmt.Println(err)
@@ -69,7 +70,7 @@ func main() {
 		stopId, _ := strconv.Atoi(strings.Split(cfg.StopFile, ".")[1])
 		for rows.Next() {
 			var logName string
-			err := rows.Scan(&logName, &_ignore)
+			err := rows.Scan(&logName, &_ignore1, &_ignore2)
 			if err != nil {
 				fmt.Println(err)
 				return
@@ -97,6 +98,7 @@ func main() {
 			var timeout context.CancelFunc
 			var e *replication.BinlogEvent
 			var err error
+			// 非在线模式下设置3S超时
 			if !cfg.StopNever {
 				ctx, timeout = context.WithTimeout(ctx, time.Second*3)
 				e, err = streamer.GetEvent(ctx)
